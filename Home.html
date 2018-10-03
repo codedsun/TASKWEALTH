@@ -1,0 +1,130 @@
+<html>
+<!DOCTYPE html>
+<script src="https://www.gstatic.com/firebasejs/5.5.2/firebase.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.5.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.5.2/firebase-database.js"></script>
+<html lang="en" dir="ltr">
+  <head>
+
+    <meta charset="utf-8">
+    <title>URL SHORTENER</title>
+  <style >
+  .center-block {
+margin: 20%;
+display: block;
+}
+  </style>
+
+  <script>
+
+    var date = Date.now();
+
+    var config = {
+      apiKey: "AIzaSyC4M9Cm_t0MECEewAun-PmhjEhc__b7zv0",
+      databaseURL: "https://fir-app-3c15d.firebaseio.com/",
+      projectId: "fir-app-3c15d",
+    };
+
+    firebase.initializeApp(config);
+     var database = firebase.database();
+     var links = database.ref('links');
+
+     function unshortenLinkClick() {
+       var value = document.getElementById("url").value;
+       if(value != null || value.length()!=0) {
+
+           findLink(value);
+       }
+       else {
+         alert("Empty or Wrong Data");
+       }
+     }
+
+     function shortenLinkClick() {
+       var value = document.getElementById("url1").value;
+       if(value != null || value.length()!=0) {
+
+           submitLink(value);
+       }
+       else {
+         alert("Empty or Wrong Data");
+       }
+     }
+
+
+    function findLink(unlink) {
+      regexp =  /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;
+
+      if(regexp.test(unlink)){
+        console.log("Checking link"+unlink);
+
+        //Checking the links
+        links.orderByChild('unlink').equalTo(unlink).on('value',function(snapshot) {
+          snapshot.forEach(function(child){
+            console.log("FOUND "+child.key);
+            alert(child.val()["link"]);
+          });
+        });
+
+
+      }
+      else{
+        alert("Wrong Link");
+      }
+
+    }
+
+    function submitLink(link){
+      regexp =  /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;
+
+      if(regexp.test(link)){
+        console.log("Checking link"+link);
+        links.orderByChild('link').equalTo(link).on('value',function(snapshot) {
+          snapshot.forEach(function(child){
+            console.log("FOUND "+child.key);
+            alert(child.val()["unlink"]);
+          });
+        });
+
+        if(true) {
+            insertDB(Date.now(), link);
+        }
+      }
+      else{
+        alert("Wrong Link");
+      }
+
+    }
+
+    function insertDB (date,link) {
+      console.log("inserting key:"+date+" "+link);
+      var unlink1 = "www.xyz.com/"
+      var unlink  = unlink1.concat(date)
+      database.ref('links'+'/'+date).set({
+       link,unlink
+    });
+  }
+
+
+
+  </script>
+
+  </head>
+  <body>
+    <div class="center-block">
+  <h4> Enter the Shortened URl </h4>
+  <input  type="text" id="url">
+  <input type="button" onclick="unshortenLinkClick()" onsubmit="unshortenLinkClick()" value="submit"  />
+</div>
+
+<div class="center-block">
+  <h4> Enter the URL to be Shortened </h4>
+  <input  type="text" id="url1">
+  <input type="button" onclick="shortenLinkClick()" onsubmit="shortenLinkClick()" value="submit"  />
+
+</div>
+
+  </body>
+
+
+</html>
